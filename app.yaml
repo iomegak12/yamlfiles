@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: iomegadevopsproject
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: iomegadevopsproject
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: iomegadevopsproject
+        image: iomegacontainerregistry.azurecr.io/iomegadevopsproject:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+        env:
+        - name: ASPNETCORE_URLS
+          value: http://*:80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iomegadevopsproject
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: iomegadevopsproject
+    
